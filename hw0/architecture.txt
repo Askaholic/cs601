@@ -1,10 +1,11 @@
 Registers:
-  There are 8 registers (0 - 7)
+  There are 16 general purpose registers (0 - 15) as well as a program counter
+  and a control register for debugging.
 
 Instructions:
   Each instruction is 16-bits wide
 
-  0x0mmj - LOAD from mem location m into register j
+  0xFmmj - LOAD from mem location m into register j
   0x1mmj - STORE from register j into mem location m
   0x2#jk - ADD value in register k to register j. Bits in # are ignored.
   0x3iij - ADD IMMEDIATE. Add value ii to register j.
@@ -14,3 +15,4 @@ Instructions:
   0x5iij - BRANCH IF NOT EQUAL TO ZERO.
             Adds the constant i to the program counter if register j is not
             equal to zero.
+  0x6##j - READ an integer and store it in register j

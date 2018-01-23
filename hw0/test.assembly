@@ -1,13 +1,13 @@
 ; Clear registers
 ADDI 0 0
-ADDI 0 1
+ADDI 0 15
 
 ; Load values
 ADDI 2 0
-ADDI 3 1
+ADDI 30 15
 
 ; Add registers
-ADD 0 1
+ADD 0 15
 
 ; Store the result into mem location 2
 STORE 2 0

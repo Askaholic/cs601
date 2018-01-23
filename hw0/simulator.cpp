@@ -13,13 +13,14 @@
 
 
 using std::cout;
+using std::cin;
 using std::endl;
 using std::size_t;
 
 
 class CPU {
 public:
-  int regs[8];    // General purpose registers
+  int regs[16];    // General purpose registers
   int p_counter;  // Program counter
   int c_debug = 0; // Control register for enabling debug printout
   short prog_mem[256];
@@ -36,7 +37,7 @@ int CPU::run() {
     short i1 = (instruction >> 4) & 0xFF;
     short i2 = instruction & 0xF;
     switch (opcode) {
-      case 0x0:
+      case 0xF:
         if (c_debug) { cout << "Loading mem[" << i1 << "] into reg[" << i2 << "]\n"; }
         regs[i2] = mem[i1]; break; // LOAD
       case 0x1:
@@ -47,7 +48,6 @@ int CPU::run() {
         if (c_debug) { cout << "Adding reg[" << i1 << "] to reg[" << i2 << "]\n"; }
         regs[i2] += regs[i1]; break; // ADD
       case 0x3:
-        i1 = i1 & 0xF;
         if (c_debug) { cout << "Adding " << i1 << " to reg[" << i2 << "]\n"; }
         regs[i2] += i1; break; // ADD IMMEDIATE
       case 0x4:
@@ -58,6 +58,10 @@ int CPU::run() {
         if (c_debug) { cout << "Branching to" << p_counter + i1 << " if reg[" << i2 << "] is not 0\n"; }
         if (regs[i2] != 0) { p_counter += i1; }
         break; // BRANCH IF NOT EQUAL TO ZERO
+      case 0x6:
+        if (c_debug) { cout << "Reading integer into reg[" << i2 << "]\n"; }
+        cin >> regs[i2];
+        break; // READ INT
       default:
         return -1;
     }
@@ -78,7 +82,7 @@ void loadProgram(CPU& cpu, std::ifstream& program_file) {
     }
 
     short second = (byte & 0xFFFF) << 8;
-    cpu.prog_mem[p_loc] = first & second;
+    cpu.prog_mem[p_loc] = first | second;
 
     first = 0;
     has1 = false;
@@ -101,6 +105,7 @@ int main(int argc, char const *argv[]) {
   }
 
   CPU cpu = CPU();
+  cpu.c_debug = 1;
   loadProgram(cpu, program_file);
 
   if (program_file.is_open()) program_file.close();
@@ -118,8 +123,5 @@ int main(int argc, char const *argv[]) {
   // cpu.prog_mem[3] = 0x1020;
   // cpu.prog_mem[4] = 0xF000; // Illigal instruction should stop the program
 
-  int code = cpu.run();
-  cout << "Result: " << cpu.mem[2] << endl;
-
-  return code;
+  return cpu.run();
 }

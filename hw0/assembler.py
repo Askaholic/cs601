@@ -9,7 +9,7 @@ import re
 
 
 codes = {
-    "LOAD": 0x0,
+    "LOAD": 0xF,
     "STORE": 0x1,
     "ADD": 0x2,
     "ADDI": 0x3,
@@ -38,11 +38,12 @@ def assemble(inname, outname):
                     print(line)
                     return;
                 i = match.groups()
-                byte1 = ((codes[i[0]] & 0xF) << 4) & ((int(i[1]) >> 4) & 0xF)
-                byte2 = 0
-                print(format(((codes[i[0]] & 0xF) << 4) & 0xFF, '02x'))
-                out.write(bytes(byte2))
-                out.write(bytes(byte1))
+                byte1 = ((codes[i[0]] << 4) & 0xF0) | ((int(i[1]) >> 4) & 0xF)
+                byte2 = ((int(i[1]) & 0xF) << 4) | (int(i[2]) & 0xF)
+                # print(format((codes[i[0]] << 4), '02x'))
+                print("0x{}{}".format(format(byte1, '02x'), format(byte2, '02x')))
+                out.write(byte2.to_bytes(1, 'little'))
+                out.write(byte1.to_bytes(1, 'little'))
 
 
 
@@ -50,6 +51,7 @@ def assemble(inname, outname):
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("usage: assembler.py filename")
+        sys.exit(0)
 
     filename = sys.argv[1]
 
