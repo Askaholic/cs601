@@ -45,8 +45,8 @@ int CPU::run() {
         mem[i1] = regs[i2]; break; // STORE
       case 0x2:
         i1 = i1 & 0xF;
-        if (c_debug) { cout << "Adding reg[" << i1 << "] to reg[" << i2 << "]\n"; }
-        regs[i2] += regs[i1]; break; // ADD
+        if (c_debug) { cout << "Adding reg[" << i2 << "] to reg[" << i1 << "]\n"; }
+        regs[i1] += regs[i2]; break; // ADD
       case 0x3:
         if (c_debug) { cout << "Adding " << i1 << " to reg[" << i2 << "]\n"; }
         regs[i2] += i1; break; // ADD IMMEDIATE
