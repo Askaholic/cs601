@@ -1,0 +1,84 @@
+; grab N from the user
+; N is in register 15
+READ 0 15
+
+; factor array starts at mem[0]
+; for(int i=0; i<N ; i++) i is in register 1
+; i = 0
+XOR 1 1
+
+; Copy i
+XOR 2 2
+ADD 2 1
+
+; i < N
+SUB 2 15
+; Jump to :loop2
+BLZ 1 2
+JUMP 10 0
+
+XOR 0 0
+STOREP 1 0
+
+; 1++
+ADDI 1 1
+
+; Loop back to the start
+JUMP 1 0
+
+; for(int P=2; P<N ; P++)
+; current prime (P) is in register 3
+; :loop2
+; P=2
+XOR 3 3
+ADDI 2 3
+
+; Copy P
+XOR 2 2
+ADD 2 3
+
+; P < N
+SUB 2 15
+BLZ 1 2
+JUMP 100 0
+
+; if factors[P] == 0
+XOR 2 2
+LOADP 3 2
+BEZ 1 2
+; Skip over the contents of the if block (jump to end of loop)
+JUMP 35 0
+PRINT 0 3
+
+; Mark all multiples as not prime
+; for (M=p+p; M<N; M+=P)
+; M = P + P
+XOR 4 4
+ADD 4 3
+ADD 4 3
+
+; Copy M
+XOR 2 2
+ADD 2 4
+
+SUB 2 15
+BLZ 1 2
+; Jump to the end of the loop
+JUMP 35 0
+
+; factors[M] = 1;
+XOR 0 0
+ADDI 1 0
+STOREP 4 0
+
+; M += P
+ADD 4 3
+JUMP 25 0
+
+; endif
+
+; P++
+ADDI 1 3
+
+; Loop back to the start of :loop2
+JUMP 12 0

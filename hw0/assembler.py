@@ -14,7 +14,14 @@ codes = {
     "ADD": 0x2,
     "ADDI": 0x3,
     "BEZ": 0x4,
-    "BNZ": 0x5
+    "BLZ": 0x5,
+    "READ": 0x6,
+    "PRINT": 0x7,
+    "JUMP": 0x8,
+    "SUB": 0x9,
+    "STOREP": 0xA,
+    "LOADP": 0xB,
+    "XOR": 0xC
 }
 
 
@@ -25,7 +32,7 @@ def assemble(inname, outname):
             code_regex += "|"
         code_regex += name
 
-    regex = r'{} (\d*) (\d*)'.format("({})".format(code_regex))
+    regex = r'{} (-?\d*) (\d*)'.format("({})".format(code_regex))
     with open(inname) as f:
         with open(outname, 'wb') as out:
             for line in f:

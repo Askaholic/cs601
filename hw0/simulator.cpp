@@ -27,6 +27,9 @@ public:
   int mem[256];
 
   int run();
+
+private:
+  int _sign_ext(char);
 };
 
 
@@ -34,7 +37,7 @@ int CPU::run() {
   while (true) {
     int instruction = prog_mem[p_counter];
     int opcode = (instruction >> 12) & 0xF;
-    short i1 = (instruction >> 4) & 0xFF;
+    short i1 = _sign_ext((instruction >> 4) & 0xFF);
     short i2 = instruction & 0xF;
     switch (opcode) {
       case 0xF:
@@ -51,21 +54,54 @@ int CPU::run() {
         if (c_debug) { cout << "Adding " << i1 << " to reg[" << i2 << "]\n"; }
         regs[i2] += i1; break; // ADD IMMEDIATE
       case 0x4:
-        if (c_debug) { cout << "Branching to" << p_counter + i1 << " if reg[" << i2 << "] is 0\n"; }
+        if (c_debug) { cout << "Branching to " << p_counter + i1 << " if reg[" << i2 << "] is 0\n"; }
         if (regs[i2] == 0) { p_counter += i1; }
         break; // BRANCH IF EQUAL TO ZERO
       case 0x5:
-        if (c_debug) { cout << "Branching to" << p_counter + i1 << " if reg[" << i2 << "] is not 0\n"; }
-        if (regs[i2] != 0) { p_counter += i1; }
-        break; // BRANCH IF NOT EQUAL TO ZERO
+        if (c_debug) { cout << "Branching to " << p_counter + i1 << " if reg[" << i2 << "] is not 0\n"; }
+        if (regs[i2] < 0) { p_counter += i1; }
+        break; // BRANCH IF LESS THAN ZERO
       case 0x6:
         if (c_debug) { cout << "Reading integer into reg[" << i2 << "]\n"; }
         cin >> regs[i2];
         break; // READ INT
+      case 0x7:
+        if (c_debug) { cout << "Printing integer in reg[" << i2 << "]\n"; }
+        cout << regs[i2] << "\n";
+        break; // PRINT INT
+      case 0x8:
+        if (c_debug) { cout << "Jumping to " << i1 << "\n"; }
+        p_counter = i1;
+        break; // JUMP
+      case 0x9:
+        i1 = i1 & 0xF;
+        if (c_debug) { cout << "Subtracting reg[" << i2 << "] from reg[" << i1 << "]\n"; }
+        regs[i1] -= regs[i2]; break; // SUB
+      case 0xA:
+        i1 = i1 & 0xF;
+        if (c_debug) { cout << "Storing reg[" << i2 << "] into mem[reg[" << i1 << "]]\n"; }
+        mem[regs[i1]] = regs[i2]; break; // STORE from register
+      case 0xB:
+        i1 = i1 & 0xF;
+        if (c_debug) { cout << "Loading mem[reg[" << i2 << "]] into reg[" << i1 << "]\n"; }
+        regs[i2] = mem[regs[i1]]; break; // LOAD from register
+      case 0xC:
+        i1 = i1 & 0xF;
+        if (c_debug) { cout << "XORing reg[" << i2 << "] to reg[" << i1 << "]\n"; }
+        regs[i1] = regs[i1] ^ regs[i2]; break; // LOAD from register
       default:
         return -1;
     }
     p_counter++;
+  }
+}
+
+int CPU::_sign_ext(char a) {
+  if((a & 0x80) >> 7) {
+    return (a & 0xFFFFFFFFFFFFFFFF);
+  }
+  else {
+    return (a & 0x00000000000000FF);
   }
 }
 
@@ -105,7 +141,6 @@ int main(int argc, char const *argv[]) {
   }
 
   CPU cpu = CPU();
-  cpu.c_debug = 1;
   loadProgram(cpu, program_file);
 
   if (program_file.is_open()) program_file.close();
@@ -123,5 +158,11 @@ int main(int argc, char const *argv[]) {
   // cpu.prog_mem[3] = 0x1020;
   // cpu.prog_mem[4] = 0xF000; // Illigal instruction should stop the program
 
-  return cpu.run();
+  int ret = cpu.run();
+
+  // for (size_t i = 0; i < 256; i++) {
+  //   cout << "mem[" << i << "] = " << cpu.mem[i] << '\n';
+  // }
+
+  return ret;
 }

@@ -7,12 +7,18 @@ Instructions:
 
   0xFmmj - LOAD from mem location m into register j
   0x1mmj - STORE from register j into mem location m
-  0x2#jk - ADD value in register k to register j. Bits in # are ignored.
+  0x2#jk - ADD reg[j] += reg[k]
   0x3iij - ADD IMMEDIATE. Add value ii to register j.
   0x4iij - BRANCH IF EQUAL TO ZERO.
             Adds the constant i to the program counter if register j is equal to
             zero.
-  0x5iij - BRANCH IF NOT EQUAL TO ZERO.
-            Adds the constant i to the program counter if register j is not
-            equal to zero.
+  0x5iij - BRANCH IF LESS THAN ZERO.
+            Adds the constant i to the program counter if register j is less
+            than zero.
   0x6##j - READ an integer and store it in register j
+  0x7##j - PRINT the integer in register j
+  0x8ii# - JUMP to instruction i
+  0x9#jk - SUB reg[j] -= reg[k]
+  0xA#kj - STORE from register j into mem location reg[k]
+  0xB#kj - LOAD from mem location reg[k] into register j
+  0xC#jk - XOR reg[j] ^= reg[k]
