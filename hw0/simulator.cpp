@@ -10,12 +10,17 @@
 #include <iostream>
 #include <fstream>
 #include <cstddef>
+#include <chrono>
+#include <ctime>
 
 
 using std::cout;
 using std::cin;
 using std::endl;
 using std::size_t;
+
+
+auto start = std::chrono::system_clock::now();
 
 
 class CPU {
@@ -64,10 +69,13 @@ int CPU::run() {
       case 0x6:
         if (c_debug) { cout << "Reading integer into reg[" << i2 << "]\n"; }
         cin >> regs[i2];
+        // Start the timer after reading the input
+        start = std::chrono::system_clock::now();
         break; // READ INT
       case 0x7:
         if (c_debug) { cout << "Printing integer in reg[" << i2 << "]\n"; }
-        cout << regs[i2] << "\n";
+        // Commented out for timing
+        // cout << regs[i2] << "\n";
         break; // PRINT INT
       case 0x8:
         if (c_debug) { cout << "Jumping to " << i1 << "\n"; }
@@ -133,7 +141,6 @@ int main(int argc, char const *argv[]) {
     return 0;
   }
 
-
   std::ifstream program_file(argv[1], std::ios_base::binary);
   if (!program_file.is_open()) {
     cout << "Could not open file '" << argv[1] << "'\n";
@@ -145,24 +152,11 @@ int main(int argc, char const *argv[]) {
 
   if (program_file.is_open()) program_file.close();
 
-
-
   // cpu.c_debug = 1;
-  //
-  // cpu.mem[0] = 2;
-  // cpu.mem[1] = 2;
-  //
-  // cpu.prog_mem[0] = 0x0000;
-  // cpu.prog_mem[1] = 0x0011;
-  // cpu.prog_mem[2] = 0x2010;
-  // cpu.prog_mem[3] = 0x1020;
-  // cpu.prog_mem[4] = 0xF000; // Illigal instruction should stop the program
 
   int ret = cpu.run();
-
-  // for (size_t i = 0; i < 256; i++) {
-  //   cout << "mem[" << i << "] = " << cpu.mem[i] << '\n';
-  // }
+  auto end = std::chrono::system_clock::now();
+  std::cout << "Took " << ((std::chrono::nanoseconds)(end - start)).count() << "ns" << '\n';
 
   return ret;
 }
